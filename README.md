@@ -8,6 +8,6 @@ Primeiramente voce irá precisar baixar e instalar a linguagem Python em seu com
 
 ### Desenvolvedores
 Vitor Barroso Rodrigues
-Nathan G. Lopes
-Leo Martelli
-Bruno Gabriel Pelegrina
+<br>Nathan G. Lopes
+<br>Leo Martelli
+<br>Bruno Gabriel Pelegrina
