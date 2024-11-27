@@ -6,6 +6,7 @@ from block import colors
 zoom = 30
 fieldHeight = 20
 fieldWidth = 10
+highscore = 0
 
 screenWidth = fieldWidth * zoom + 200
 screenHeight = fieldHeight * zoom + 100
@@ -37,7 +38,7 @@ def draw_button(screen, text, x, y, width, height, active):
 # Menu inicial
 def main_menu():
     menu_running = True
-    options = ["Jogar", "Sair"]
+    options = ["Jogar", "Controles", "Sair"]
     selected = 0
 
     while menu_running:
@@ -71,6 +72,7 @@ def main_menu():
 
 # Inicializar jogo
 def play_game():
+    global highscore
     game = Tetris(fieldHeight, fieldWidth, zoom)
     counter = 0
     pressing_down = False
@@ -128,9 +130,19 @@ def play_game():
 
         # Exibe a pontuação e estado do jogo
         font = pygame.font.SysFont('Comic Sans MS', 25, True, False)
-        text = font.render("Pontuação: " + str(game.score), True, text_color)
-        screen.blit(text, [fieldWidth * zoom + 20, 20])
+        text_score = font.render("Pontuação: " + str(game.score), True, text_color)
+        text_highscore = font.render("Highscore: " + str(highscore), True, text_color)
+
+        # Exibir na tela
+        screen.blit(text_highscore, [fieldWidth * zoom + 20, 20])
+        screen.blit(text_score, [fieldWidth * zoom + 20, 50])
+
         if game.state == "gameover":
+            # Atualizar o highscore se necessário
+            if game.score > highscore:
+                highscore = game.score
+
+            # Exibir mensagem de Game Over
             font1 = pygame.font.SysFont('Comic Sans MS', 65, True, False)
             text_game_over = font1.render("Game Over", True, (255, 50, 50))
             screen.blit(text_game_over, [screenWidth // 2 - 150, screenHeight // 2 - 50])
@@ -138,12 +150,59 @@ def play_game():
         pygame.display.flip()
         clock.tick(fps)
 
+        # Tela de controles
+def show_controls():
+    controls_running = True
+
+    while controls_running:
+        screen.fill(background_color)
+
+        # Título
+        font = pygame.font.SysFont("Comic Sans MS", 60, True)
+        title_surface = font.render("Controles", True, title_color)
+        title_rect = title_surface.get_rect(center=(screenWidth // 2, 50))
+        screen.blit(title_surface, title_rect)
+
+        # Texto dos controles
+        font_text = pygame.font.SysFont("Comic Sans MS", 25)
+        controls = [
+            "Setas Esquerda/Direita: Mover peça",
+            "Seta Cima: Girar peça",
+            "Seta Baixo: Acelerar queda",
+            "Espaço: Queda rápida",
+            "ESC: Reiniciar jogo",
+        ]
+        for i, line in enumerate(controls):
+            text_surface = font_text.render(line, True, text_color)
+            text_rect = text_surface.get_rect(center=(screenWidth // 2, 150 + i * 40))
+            screen.blit(text_surface, text_rect)
+
+        # Mensagem para voltar
+        back_message = font_text.render("Pressione ESC para voltar", True, text_color)
+        back_rect = back_message.get_rect(center=(screenWidth // 2, screenHeight - 50))
+        screen.blit(back_message, back_rect)
+
+        # Processar eventos
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                return "exit"
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    controls_running = False
+
+        pygame.display.flip()
+        clock.tick(60)
+
+
 # Loop principal
 while not done:
     option = main_menu()
     if option == "jogar":
         play_game()
+    elif option == "controles":
+        show_controls()
     elif option == "sair" or option == "exit":
         done = True
+
 
 pygame.quit()
