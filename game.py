@@ -3,11 +3,11 @@ from tetris import Tetris
 from block import colors
 
 # Configurações gerais
-zoom = 30
+zoom = 35
 fieldHeight = 20
 fieldWidth = 10
 
-screenWidth = fieldWidth * zoom + 200
+screenWidth = fieldWidth * zoom + 300
 screenHeight = fieldHeight * zoom + 100
 
 pygame.init()
@@ -16,7 +16,7 @@ pygame.display.set_caption("Tetris")
 
 done = False
 clock = pygame.time.Clock()
-fps = 25
+fps = 20
 
 # Paleta de cores
 background_color = (30, 30, 60)
@@ -75,13 +75,17 @@ def play_game():
     counter = 0
     pressing_down = False
 
+    def drawText(font, size, text):
+        sysFont = pygame.font.SysFont(font, size, True, False)
+        renderedText = sysFont.render(text, True, text_color)
+        screen.blit(renderedText, [fieldWidth * zoom + 20, 20])
+
     while not done:
         if game.block is None:
             game.new_block()
         counter += 1
         if counter > 100000:
             counter = 0
-
         if counter % (fps // game.level // 2) == 0 or pressing_down:
             if game.state == "start":
                 game.go_down()
@@ -101,7 +105,7 @@ def play_game():
                 if event.key == pygame.K_SPACE:
                     game.go_space()
                 if event.key == pygame.K_ESCAPE:
-                    game.__init__(20, 10, 30)
+                    game.__init__(fieldHeight, fieldWidth, zoom)
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_DOWN:
                     pressing_down = False
@@ -125,22 +129,29 @@ def play_game():
                                          [game.x + game.zoom * (j + game.block.x) + 2,
                                           game.y + game.zoom * (i + game.block.y) + 2,
                                           game.zoom - 4, game.zoom - 4])
+        
+        if game.next_block is not None:
+            for i in range(4):
+                for j in range(4):
+                    if i * 4 + j in game.next_block.image():
+                        pygame.draw.rect(screen, colors[game.next_block.color],
+                            [fieldWidth * zoom + 150 + zoom * j, 150 + zoom * i, zoom - 4, zoom - 4]) 
 
         # Exibe a pontuação e estado do jogo
-        font = pygame.font.SysFont('Comic Sans MS', 25, True, False)
-        text = font.render("Pontuação: " + str(game.score), True, text_color)
-        screen.blit(text, [fieldWidth * zoom + 20, 20])
+        
+        drawText('Comic Sans MS', 25, ("Pontuação: " + str(game.score)))
+        
         if game.state == "gameover":
-            font1 = pygame.font.SysFont('Comic Sans MS', 65, True, False)
-            text_game_over = font1.render("Game Over", True, (255, 50, 50))
-            screen.blit(text_game_over, [screenWidth // 2 - 150, screenHeight // 2 - 50])
+            drawText('Comic Sans MS', 65, "Game Over")
 
         pygame.display.flip()
         clock.tick(fps)
 
 # Loop principal
 while not done:
+    
     option = main_menu()
+    
     if option == "jogar":
         play_game()
     elif option == "sair" or option == "exit":
