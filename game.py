@@ -2,6 +2,13 @@ import pygame
 from tetris import Tetris
 from block import colors
 
+pygame.mixer.init()
+
+# Carregar a música de fundo
+pygame.mixer.music.load("tetris-theme-classical.mp3")  # Substitua pelo caminho correto
+pygame.mixer.music.set_volume(0.5)  # Ajusta o volume (0.0 a 1.0)
+pygame.mixer.music.play(-1)  # Reproduz em loop
+
 # Configurações gerais
 zoom = 35
 fieldHeight = 20
@@ -57,10 +64,13 @@ def main_menu():
         screen.fill(background_color)
 
         # Título
-        font = pygame.font.SysFont("Comic Sans MS", 60, True)
-        title_surface = font.render("TETRIS", True, title_color)
-        title_rect = title_surface.get_rect(center=(screenWidth // 2, 100))
-        screen.blit(title_surface, title_rect)
+        drawText(60, "TETRIS", [screenWidth // 2 - 115, 90], title_color)
+
+        drawText(30, 'BLNV Games Team', [screenWidth // 2 - 130, 450])
+        drawText(20, 'Vitor Barroso Rodrigues', [screenWidth // 2 - 280, 550])
+        drawText(20, 'Bruno Gabriel Rodrigues', [screenWidth // 2 + 30, 550])
+        drawText(20, 'Leonardo Martelli', [screenWidth // 2 - 280, 650])
+        drawText(20, 'Nathan Golçalves Lopes', [screenWidth // 2 + 30, 650])
 
         # Botões do menu
         for i, option in enumerate(options):
