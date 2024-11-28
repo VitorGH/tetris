@@ -148,8 +148,8 @@ def play_game():
 
         # Exibir na tela
         
-        drawText(25, ("Highscore: " + str(highscore)), [fieldWidth * zoom + 135, 50])
-        drawText(25, ("Pontuação: " + str(game.score)), [fieldWidth * zoom + 135, 90])
+        drawText(25, ("Highscore: " + str(highscore)), [fieldWidth * zoom + 125, 50])
+        drawText(25, ("Pontuação: " + str(game.score)), [fieldWidth * zoom + 125, 90])
 
         # Desenhar o título da próxima peça
         drawText(25, "Próxima peça", [fieldWidth * zoom + 130, 300]) 
@@ -158,6 +158,9 @@ def play_game():
         if game.state == "gameover":
             drawText(65, "Game Over", [screenWidth // 2 - 150, screenHeight // 2 - 50])
             drawText(30, "ESC para reiniciar", [screenWidth // 2 - 100, screenHeight // 2 + 20])
+
+        if game.score > highscore:
+                highscore = game.score
 
         pygame.display.flip()
         clock.tick(fps)
