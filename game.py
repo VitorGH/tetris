@@ -3,12 +3,12 @@ from tetris import Tetris
 from block import colors
 
 # Configurações gerais
-zoom = 30
+zoom = 35
 fieldHeight = 20
 fieldWidth = 10
 highscore = 0
 
-screenWidth = fieldWidth * zoom + 200
+screenWidth = fieldWidth * zoom + 300
 screenHeight = fieldHeight * zoom + 100
 
 pygame.init()
@@ -17,7 +17,7 @@ pygame.display.set_caption("Tetris")
 
 done = False
 clock = pygame.time.Clock()
-fps = 25
+fps = 20
 
 # Paleta de cores
 background_color = (30, 30, 60)
@@ -25,6 +25,18 @@ button_color = (70, 130, 180)
 button_hover_color = (100, 149, 237)
 text_color = (255, 255, 255)
 title_color = (255, 215, 0)
+
+
+font = "Comic Sans MS"
+def drawText(size, text, blit, functionColor=None):
+    sysFont = pygame.font.SysFont(font, size, True, False)
+    
+    if functionColor is None:
+        renderedText = sysFont.render(text, True, text_color)
+    else:
+        renderedText = sysFont.render(text, True, functionColor)
+
+    screen.blit(renderedText, blit)
 
 # Função para desenhar botões
 def draw_button(screen, text, x, y, width, height, active):
@@ -83,7 +95,6 @@ def play_game():
         counter += 1
         if counter > 100000:
             counter = 0
-
         if counter % (fps // game.level // 2) == 0 or pressing_down:
             if game.state == "start":
                 game.go_down()
@@ -103,7 +114,7 @@ def play_game():
                 if event.key == pygame.K_SPACE:
                     game.go_space()
                 if event.key == pygame.K_ESCAPE:
-                    game.__init__(20, 10, 30)
+                    game.__init__(fieldHeight, fieldWidth, zoom)
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_DOWN:
                     pressing_down = False
@@ -127,25 +138,26 @@ def play_game():
                                          [game.x + game.zoom * (j + game.block.x) + 2,
                                           game.y + game.zoom * (i + game.block.y) + 2,
                                           game.zoom - 4, game.zoom - 4])
-
-        # Exibe a pontuação e estado do jogo
-        font = pygame.font.SysFont('Comic Sans MS', 25, True, False)
-        text_score = font.render("Pontuação: " + str(game.score), True, text_color)
-        text_highscore = font.render("Highscore: " + str(highscore), True, text_color)
+        
+        if game.next_block is not None:
+            for i in range(4):
+                for j in range(4):
+                    if i * 4 + j in game.next_block.image():
+                        pygame.draw.rect(screen, colors[game.next_block.color],
+                            [fieldWidth * zoom + 150 + zoom * j, 150 + zoom * i, zoom - 4, zoom - 4]) 
 
         # Exibir na tela
-        screen.blit(text_highscore, [fieldWidth * zoom + 20, 20])
-        screen.blit(text_score, [fieldWidth * zoom + 20, 50])
+        
+        drawText(25, ("Highscore: " + str(highscore)), [fieldWidth * zoom + 135, 50])
+        drawText(25, ("Pontuação: " + str(game.score)), [fieldWidth * zoom + 135, 90])
 
+        # Desenhar o título da próxima peça
+        drawText(25, "Próxima peça", [fieldWidth * zoom + 130, 300]) 
+        
+        # Game-over
         if game.state == "gameover":
-            # Atualizar o highscore se necessário
-            if game.score > highscore:
-                highscore = game.score
-
-            # Exibir mensagem de Game Over
-            font1 = pygame.font.SysFont('Comic Sans MS', 65, True, False)
-            text_game_over = font1.render("Game Over", True, (255, 50, 50))
-            screen.blit(text_game_over, [screenWidth // 2 - 150, screenHeight // 2 - 50])
+            drawText(65, "Game Over", [screenWidth // 2 - 150, screenHeight // 2 - 50])
+            drawText(30, "ESC para reiniciar", [screenWidth // 2 - 100, screenHeight // 2 + 20])
 
         pygame.display.flip()
         clock.tick(fps)
@@ -158,10 +170,7 @@ def show_controls():
         screen.fill(background_color)
 
         # Título
-        font = pygame.font.SysFont("Comic Sans MS", 60, True)
-        title_surface = font.render("Controles", True, title_color)
-        title_rect = title_surface.get_rect(center=(screenWidth // 2, 50))
-        screen.blit(title_surface, title_rect)
+        drawText(60, "Controles", [screenWidth // 2 - 150, 50], title_color)
 
         # Texto dos controles
         font_text = pygame.font.SysFont("Comic Sans MS", 25)
@@ -196,7 +205,9 @@ def show_controls():
 
 # Loop principal
 while not done:
+    
     option = main_menu()
+    
     if option == "jogar":
         play_game()
     elif option == "controles":

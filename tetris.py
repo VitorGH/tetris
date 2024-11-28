@@ -11,7 +11,8 @@ class Tetris:
         self.x = 100
         self.y = 60 
         self.zoom = zoom
-        self.block = None  
+        self.block = None
+        self.next_block = Block(3, 0)
 
         # Cria o campo de jogo preenchido com zeros
         for i in range(height):
@@ -21,7 +22,8 @@ class Tetris:
             self.field.append(new_line)
 
     def new_block(self):
-        self.block = Block(3, 0)
+        self.block = self.next_block
+        self.next_block = Block(3, 0)
 
     def intersects(self):
         # Verifica se a figura atual colide com o campo ou com outras figuras
